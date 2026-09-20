@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Farmlytic - multilingual agriculture calculators and farming utilities for farmers.">
+<meta name="theme-color" content="#2f7d32">
+<title>Farmlytic V2 — Agriculture Platform</title>
+<style>
+:root{--g:#2f7d32;--g2:#55a64b;--cream:#f7f3e8;--ink:#18351b;--muted:#68736a;--card:#fff;--line:#e5e8df;--shadow:0 8px 28px #24401a12}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(#f7f8f2,#fff);color:var(--ink);padding-bottom:76px}
+header{background:linear-gradient(135deg,#1f6b2a,#55a64b);color:#fff;padding:22px 16px 26px;border-radius:0 0 28px 28px;box-shadow:var(--shadow)}
+.top{max-width:1050px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-weight:900;font-size:25px;letter-spacing:-.5px}.tag{font-size:12px;opacity:.85}
+select,.search{border:0;border-radius:14px;padding:12px;background:#ffffffee;color:#18351b;font-weight:650}.search{width:100%;font-size:16px;outline:none}
+.wrap{max-width:1050px;margin:auto;padding:18px 14px}.hero h1{font-size:clamp(28px,6vw,44px);margin:10px 0 6px}.hero p{margin:0 0 16px;color:#eaf6e9}.searchbox{max-width:720px;margin-top:18px}
+h2{margin:26px 0 12px;font-size:22px}.sub{color:var(--muted);font-size:14px;margin-top:-5px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow);cursor:pointer;transition:.18s}.card:hover{transform:translateY(-2px)}.icon{font-size:28px}.card h3{margin:8px 0 4px;font-size:16px}.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.4}.pill{display:inline-block;background:#e8f5e8;color:var(--g);border-radius:99px;padding:5px 9px;font-size:11px;font-weight:800;margin-top:10px}
+.crop{min-height:125px}.guide{min-height:110px}
+section{scroll-margin-top:12px}.empty{padding:25px;text-align:center;color:var(--muted);display:none}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:center;z-index:20}.bottom div{max-width:1050px;width:100%;display:flex;justify-content:space-around}.bottom button{border:0;background:none;padding:10px 12px;color:#536257;font-weight:700}.bottom span{display:block;font-size:20px}.bottom small{font-size:10px}
+footer{max-width:1050px;margin:35px auto;padding:0 14px;color:var(--muted);font-size:12px;text-align:center}
+.modal{position:fixed;inset:0;background:#0b1b0dcc;display:none;align-items:flex-end;justify-content:center;z-index:50}.modal.show{display:flex}.sheet{background:#fff;width:min(720px,100%);max-height:90vh;overflow:auto;border-radius:24px 24px 0 0;padding:20px}.sheethead{display:flex;justify-content:space-between;gap:12px;align-items:center}.close{border:0;background:#edf2ea;border-radius:50%;width:38px;height:38px;font-size:20px}.field{margin:12px 0}.field label{display:block;font-size:13px;font-weight:750;margin-bottom:6px}.field input,.field select{width:100%;border:1px solid #d8ded3;border-radius:12px;padding:12px;font-size:16px;background:#fff}.calcbtn{width:100%;border:0;border-radius:14px;background:var(--g);color:#fff;padding:14px;font-size:16px;font-weight:800;margin-top:8px}.result{margin-top:14px;background:#edf8ed;border:1px solid #cde8cd;border-radius:16px;padding:15px;line-height:1.55}.result strong{font-size:22px;color:var(--g)}.note{font-size:12px;color:var(--muted);margin-top:8px}.error{color:#a12b2b;background:#fff0f0;border-color:#efcaca}
+@media(min-width:700px){.modal{align-items:center}.sheet{border-radius:24px}.bottom{position:sticky;bottom:0}}
+
+/* ---------- FARM LYTIC V2 STRUCTURE ---------- */
+.v2-section{margin-top:34px}.v2-head{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap}.v2-badge{display:inline-block;background:#e8f5e8;color:#2f7d32;padding:5px 9px;border-radius:99px;font-size:11px;font-weight:800;vertical-align:middle}.v2-filter{display:flex;gap:8px;overflow:auto;padding:4px 0 10px}.v2-filter button{border:1px solid #dfe6da;background:#fff;border-radius:999px;padding:9px 13px;font-weight:750;white-space:nowrap;color:#526154}.v2-filter button.active{background:#2f7d32;color:#fff;border-color:#2f7d32}.v2-card{min-height:145px}.v2-card .pill{margin-top:11px}.v2-layout{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}.v2-panel{background:#fff;border:1px solid #e5e8df;border-radius:18px;padding:17px;box-shadow:0 8px 28px #24401a12}.v2-list{margin:0;padding-left:20px}.v2-list li{margin:8px 0;color:#4f5d52;line-height:1.45}.v2-stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.v2-stat div{background:#f5f8f1;border-radius:14px;padding:11px}.v2-stat b{display:block;font-size:18px;color:#2f7d32}.v2-stage{border-left:4px solid #55a64b;padding:10px 12px;background:#f7faf5;border-radius:0 12px 12px 0;margin:9px 0}.v2-stage b{display:block;color:#18351b}.v2-note{font-size:12px;color:#68736a;line-height:1.45}.v2-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.v2-actions button{border:0;border-radius:12px;padding:10px 13px;font-weight:800;background:#2f7d32;color:#fff}.v2-actions button.secondary{background:#edf3e9;color:#2f7d32}.v2-hide{display:none!important}@media(max-width:700px){.v2-layout{grid-template-columns:1fr}.v2-stat{grid-template-columns:1fr}.v2-head{align-items:start}}
+</style>
+<meta name="google-site-verification" content="DdJY1gfZoipAT3EjQ_6vjmw_Wul4npV05gLbmb_-Sp0" />
+</head>
+<body>
+<header>
+<div class="top"><div><div class="brand">🌱 Farmlytic</div><div class="tag" data-i18n="tag">Smart agriculture utilities</div></div>
+<select id="lang"><option value="en">English</option><option value="mr">मराठी</option><option value="hi">हिन्दी</option></select></div>
+<div class="wrap hero" style="padding:18px 0 0"><h1 data-i18n="hero">Calculate. Plan. Farm smarter.</h1><p data-i18n="heroSub">Useful agriculture calculators, crop knowledge and farm economics — made for farmers.</p>
+<div class="searchbox"><input id="search" class="search" placeholder="What do you want to calculate or know?" autocomplete="off"></div></div>
+</header>
+
+<main class="wrap">
+<section id="tools"><h2 data-i18n="toolsTitle">Popular tools</h2><div id="toolsGrid" class="grid"></div><div id="empty" class="empty">No matching tool found.</div></section>
+<section id="crops"><h2 data-i18n="cropTitle">Crop hubs</h2><p class="sub" data-i18n="cropSub">Start with a crop to explore practical farming information.</p><div id="cropGrid" class="grid"></div></section>
+<section id="guides"><h2 data-i18n="guideTitle">Farming guides</h2><div id="guideGrid" class="grid"></div></section>
+
+<section id="farmplanning" class="v2-section">
+  <div class="v2-head">
+    <div>
+      <h2 style="margin-bottom:4px">Farm Planning <span class="v2-badge">V2</span></h2>
+      <p class="sub">Plan a field from area and inputs to yield, revenue and risk — not just calculate one number.</p>
+    </div>
+  </div>
+  <div class="v2-layout">
+    <div class="v2-panel">
+      <h3 style="margin-top:0">🗓️ Field Planning Workflow</h3>
+      <div class="v2-stage"><b>01 · Field</b> Record area, soil condition, water availability and previous crop.</div>
+      <div class="v2-stage"><b>02 · Planting</b> Select crop/variety, seed rate, spacing and target plant population.</div>
+      <div class="v2-stage"><b>03 · Inputs</b> Budget seed, fertilizer, crop protection, labour, machinery and irrigation.</div>
+      <div class="v2-stage"><b>04 · Crop care</b> Track irrigation, scouting, nutrient operations and field observations.</div>
+      <div class="v2-stage"><b>05 · Harvest</b> Record harvested quantity, marketable quantity and post-harvest losses.</div>
+      <div class="v2-stage"><b>06 · Economics</b> Compare revenue, profit, B:C and break-even values.</div>
+      <div class="v2-actions"><button type="button" onclick="openV2Tool('breakEven')">Calculate Break-even</button><button type="button" class="secondary" onclick="openV2Tool('farmBudget')">Build Budget</button></div>
+    </div>
+    <div class="v2-panel">
+      <h3 style="margin-top:0">📋 Field Record Checklist</h3>
+      <ul class="v2-list">
+        <li>Field area and land unit</li><li>Crop and variety</li><li>Sowing/transplanting date</li>
+        <li>Seed quantity and seed treatment</li><li>Fertilizer/nutrient applications</li><li>Irrigation dates and approximate quantity</li>
+        <li>Pest/disease observations and treatments</li><li>Labour and machinery hours</li><li>Harvest and sale records</li>
+      </ul>
+      <p class="v2-note">Keeping these records turns Farmlytic from a calculator into a simple farm decision tool.</p>
+    </div>
+  </div>
+</section>
+
+<section id="cropintel" class="v2-section">
+  <div class="v2-head">
+    <div><h2 style="margin-bottom:4px">Crop Intelligence <span class="v2-badge">V2</span></h2><p class="sub">Go beyond a crop description: stages, observations, decisions and records.</p></div>
+  </div>
+  <div class="v2-filter" id="cropIntelFilter"></div>
+  <div id="cropIntelContent" class="v2-panel"></div>
+</section>
+
+<section id="knowledge" class="v2-section">
+  <div class="v2-head">
+    <div><h2 style="margin-bottom:4px">Knowledge Center <span class="v2-badge">V2</span></h2><p class="sub">Practical explanations for decisions farmers repeatedly make.</p></div>
+  </div>
+  <div class="v2-filter" id="knowledgeFilter"></div>
+  <div id="knowledgeContent" class="grid"></div>
+</section>
+
+<section id="v2tools" class="v2-section">
+  <div class="v2-head">
+    <div><h2 style="margin-bottom:4px">Advanced Farm Tools <span class="v2-badge">V2</span></h2><p class="sub">New tools organized by actual farm tasks.</p></div>
+  </div>
+  <div class="v2-filter" id="v2ToolFilter"></div>
+  <div id="v2ToolGrid" class="grid"></div>
+</section>
+
+<section id="v2economics" class="v2-section">
+  <div class="v2-head">
+    <div><h2 style="margin-bottom:4px">Farm Economics Lab <span class="v2-badge">V2</span></h2><p class="sub">See how price, yield and cost assumptions change the result.</p></div>
+  </div>
+  <div class="v2-panel">
+    <div class="v2-stat">
+      <div><span class="v2-note">Revenue</span><b id="ecoRevenue">₹0</b></div>
+      <div><span class="v2-note">Total cost</span><b id="ecoCost">₹0</b></div>
+      <div><span class="v2-note">Profit</span><b id="ecoProfit">₹0</b></div>
+    </div>
+    <div class="grid" style="margin-top:12px">
+      <div class="field"><label>Marketable yield (kg)</label><input id="ecoYield" type="number" min="0" step="any" value="1000"></div>
+      <div class="field"><label>Expected price (₹/kg)</label><input id="ecoPrice" type="number" min="0" step="any" value="30"></div>
+      <div class="field"><label>Total cost (₹)</label><input id="ecoCostInput" type="number" min="0" step="any" value="18000"></div>
+    </div>
+    <div class="v2-actions"><button type="button" onclick="runEco()">Update Scenario</button><button type="button" class="secondary" onclick="setEcoScenario('low')">Low price</button><button type="button" class="secondary" onclick="setEcoScenario('high')">High price</button></div>
+    <p id="ecoMessage" class="v2-note" style="margin-bottom:0"></p>
+  </div>
+</section>
+<section id="economics"><h2 data-i18n="econTitle">Farm economics</h2>
+<div class="result" style="margin-bottom:14px"><strong>Farm budget in one workflow</strong>
+<p><b>1.</b> Enter field area → <b>2.</b> calculate inputs and cost → <b>3.</b> estimate marketable yield → <b>4.</b> enter selling price → <b>5.</b> calculate revenue and profit → <b>6.</b> check B:C and break-even.</p>
+<p><b>Key formulas:</b> Revenue = Yield × Price · Profit = Revenue − Total Cost · B:C = Benefit ÷ Cost · Break-even price = Cost ÷ Marketable Yield.</p>
+<div class="note">Use your own field records and realistic local price assumptions. Costs, yields and prices can change.</div></div>
+<div class="grid">
+<div class="card" onclick="openTool('profit')"><div class="icon">💰</div><h3 data-i18n="econ1">Crop Profit</h3><p data-i18n="econ1d">Estimate revenue, cost and profit.</p></div>
+<div class="card" onclick="openTool('cost')"><div class="icon">🧾</div><h3 data-i18n="econ2">Cost of Cultivation</h3><p data-i18n="econ2d">Add farm inputs and labour costs.</p></div>
+<div class="card" onclick="openTool('bc')"><div class="icon">📊</div><h3 data-i18n="econ3">B:C Ratio</h3><p data-i18n="econ3d">Compare returns with total cost.</p></div>
+</div></section>
+</main>
+
+<footer>
+<p>Farmlytic © 2026 • <span data-i18n="footer">Estimates are for planning. Actual farm recommendations depend on crop, variety, soil, climate and local agricultural advice.</span></p>
+</footer>
+
+<nav class="bottom"><div>
+<button onclick="go('home')"><span>🏠</span><small data-i18n="navHome">Home</small></button>
+<button onclick="go('tools')"><span>🧮</span><small data-i18n="navTools">Tools</small></button>
+<button onclick="go('crops')"><span>🌾</span><small data-i18n="navCrops">Crops</small></button>
+<button onclick="go('guides')"><span>📚</span><small data-i18n="navGuides">Guides</small></button>
+<button onclick="go('v2tools')"><span>💰</span><small data-i18n="navMore">More</small></button>
+</div></nav>
+
+<div id="modal" class="modal" onclick="if(event.target===this)closeModal()"><div class="sheet">
+<div class="sheethead"><div><h2 id="mTitle" style="margin:0">Calculator</h2><div id="mDesc" class="sub"></div></div><button class="close" aria-label="Close" onclick="closeModal()">×</button></div>
+<div id="form"></div><div id="res"></div>
+</div></div>
+
+<script>
+const T={
+en:{tag:"Smart agriculture utilities",hero:"Calculate. Plan. Farm smarter.",heroSub:"Useful agriculture calculators, crop knowledge and farm economics — made for farmers.",toolsTitle:"Popular tools",cropTitle:"Crop hubs",cropSub:"Start with a crop to explore practical farming information.",guideTitle:"Farming guides",econTitle:"Farm economics",econ1:"Crop Profit",econ1d:"Estimate revenue, cost and profit.",econ2:"Cost of Cultivation",econ2d:"Add farm inputs and labour costs.",econ3:"B:C Ratio",econ3d:"Compare returns with total cost.",footer:"Estimates are for planning. Actual farm recommendations depend on crop, variety, soil, climate and local agricultural advice.",navHome:"Home",navTools:"Tools",navCrops:"Crops",navGuides:"Guides",navMore:"More",search:"What do you want to calculate or know?",no:"No matching tool found."},
+mr:{tag:"स्मार्ट शेती साधने",hero:"गणना करा. नियोजन करा. शेती अधिक स्मार्ट करा.",heroSub:"शेतकऱ्यांसाठी उपयुक्त शेती कॅल्क्युलेटर, पीक माहिती आणि शेती अर्थशास्त्र.",toolsTitle:"लोकप्रिय साधने",cropTitle:"पीक माहिती",cropSub:"उपयुक्त शेती माहिती पाहण्यासाठी पीक निवडा.",guideTitle:"शेती मार्गदर्शक",econTitle:"शेती अर्थशास्त्र",econ1:"पीक नफा",econ1d:"उत्पन्न, खर्च आणि नफ्याचा अंदाज.",econ2:"लागवड खर्च",econ2d:"इनपुट आणि मजुरीचा खर्च जोडा.",econ3:"B:C गुणोत्तर",econ3d:"एकूण खर्चाच्या तुलनेत परतावा पाहा.",footer:"ही गणना नियोजनासाठी आहे. प्रत्यक्ष शिफारस पीक, वाण, माती, हवामान आणि स्थानिक कृषी सल्ल्यावर अवलंबून असते.",navHome:"होम",navTools:"साधने",navCrops:"पिके",navGuides:"मार्गदर्शक",navMore:"अधिक",search:"काय मोजायचे किंवा जाणून घ्यायचे आहे?",no:"साधन सापडले नाही."},
+hi:{tag:"स्मार्ट कृषि उपकरण",hero:"गणना करें। योजना बनाएं। खेती स्मार्ट बनाएं।",heroSub:"किसानों के लिए उपयोगी कृषि कैलकुलेटर, फसल जानकारी और कृषि अर्थशास्त्र।",toolsTitle:"लोकप्रिय उपकरण",cropTitle:"फसल जानकारी",cropSub:"व्यावहारिक कृषि जानकारी के लिए फसल चुनें।",guideTitle:"खेती मार्गदर्शक",econTitle:"कृषि अर्थशास्त्र",econ1:"फसल लाभ",econ1d:"आय, लागत और लाभ का अनुमान लगाएं।",econ2:"खेती लागत",econ2d:"इनपुट और मजदूरी की लागत जोड़ें।",econ3:"B:C अनुपात",econ3d:"कुल लागत की तुलना में रिटर्न देखें।",footer:"ये गणनाएं योजना के लिए हैं। वास्तविक सलाह फसल, किस्म, मिट्टी, मौसम और स्थानीय कृषि सलाह पर निर्भर करती है।",navHome:"होम",navTools:"उपकरण",navCrops:"फसलें",navGuides:"गाइड",navMore:"अधिक",search:"क्या गणना या जानकारी चाहिए?",no:"कोई उपकरण नहीं मिला."}
+};
+
+const UI={
+en:{
+calc:"Calculator", unit:"Unit", area:"Area (acre)", seedRate:"Seed rate (kg/acre)", row:"Row spacing (m)", plant:"Plant spacing (m)",
+reqN:"Required nitrogen (kg/acre)", reqP:"Required phosphorus (kg/acre)", reqK:"Required potassium (kg/acre)", product:"Fertilizer product",
+dose:"Product dose per acre (ml or g)", water:"Water per acre (litre)", depth:"Irrigation depth (mm)", yieldA:"Yield per acre (kg)",
+price:"Selling price (₹/kg)", costA:"Total cost per acre (₹)", benefit:"Gross return / benefit (₹)", totalCost:"Total cost (₹)",
+seedc:"Seed cost (₹)", fertc:"Fertilizer cost (₹)", pestc:"Crop protection cost (₹)", lab:"Labour cost (₹)", mach:"Machinery cost (₹)", irrig:"Irrigation cost (₹)", other:"Other cost (₹)",
+value:"Value", from:"From", to:"To", calculate:"Calculate", convert:"Convert", close:"Close", planning:"Estimated result for planning.",
+quick:"Quick tools", note:"Verify crop-specific recommendations with an official/local agricultural source.",
+noData:"Please enter valid values.", acre:"Acre", hectare:"Hectare", guntha:"Guntha", sqm:"Square metre", sqft:"Square foot",
+seedResult:"Estimated seed required.", populationResult:"Estimated plant population.", productResult:"Approximate product quantity for the selected nutrient.",
+sprayResult:"Total product = area × label dose. Total water = area × water per acre.", irrigationResult:"1 mm over 1 m² = 1 litre. Field efficiency and losses are not included.",
+yieldResult:"Estimated crop yield.", profit:"Profit", revenue:"Revenue", cost:"Cost", totalCult:"Total cultivation cost.",
+bc:"B:C ratio = gross benefit ÷ total cost.", breakEven:"Break-even price = total cost ÷ marketable yield.",
+fertNote:"Use the actual product label and local recommendation. DAP also supplies N; this simple calculator does not create a complete balanced fertilizer recommendation."
+},
+mr:{
+calc:"कॅल्क्युलेटर", unit:"एकक", area:"क्षेत्रफळ (एकर)", seedRate:"बियाणे दर (किलो/एकर)", row:"ओळीतील अंतर (मी.)", plant:"रोपांतील अंतर (मी.)",
+reqN:"आवश्यक नत्र (किलो/एकर)", reqP:"आवश्यक स्फुरद (किलो/एकर)", reqK:"आवश्यक पालाश (किलो/एकर)", product:"खताचा प्रकार",
+dose:"प्रति एकर उत्पादन डोस (मि.ली. किंवा ग्रॅम)", water:"प्रति एकर पाणी (लिटर)", depth:"सिंचनाची खोली (मि.मी.)", yieldA:"प्रति एकर उत्पादन (किलो)",
+price:"विक्री किंमत (₹/किलो)", costA:"प्रति एकर एकूण खर्च (₹)", benefit:"एकूण परतावा / उत्पन्न (₹)", totalCost:"एकूण खर्च (₹)",
+seedc:"बियाणे खर्च (₹)", fertc:"खत खर्च (₹)", pestc:"पीक संरक्षण खर्च (₹)", lab:"मजुरी खर्च (₹)", mach:"यंत्रसामग्री खर्च (₹)", irrig:"सिंचन खर्च (₹)", other:"इतर खर्च (₹)",
+value:"मूल्य", from:"पासून", to:"मध्ये", calculate:"गणना करा", convert:"रूपांतर करा", close:"बंद करा", planning:"नियोजनासाठी अंदाजित निकाल.",
+quick:"जलद साधने", note:"पीक-विशिष्ट शिफारसी अधिकृत/स्थानिक कृषी स्रोताकडून तपासा.",
+noData:"कृपया योग्य मूल्ये भरा.", acre:"एकर", hectare:"हेक्टर", guntha:"गुंठा", sqm:"चौरस मीटर", sqft:"चौरस फूट",
+seedResult:"अंदाजित आवश्यक बियाणे.", populationResult:"अंदाजित रोपांची संख्या.", productResult:"निवडलेल्या अन्नद्रव्यासाठी अंदाजित खताचे प्रमाण.",
+sprayResult:"एकूण उत्पादन = क्षेत्रफळ × लेबल डोस. एकूण पाणी = क्षेत्रफळ × प्रति एकर पाणी.", irrigationResult:"1 चौरस मीटरवर 1 मि.मी. पाणी = 1 लिटर. कार्यक्षमता व नुकसान यात धरलेले नाही.",
+yieldResult:"अंदाजित पीक उत्पादन.", profit:"नफा", revenue:"उत्पन्न", cost:"खर्च", totalCult:"एकूण लागवड खर्च.",
+bc:"B:C गुणोत्तर = एकूण परतावा ÷ एकूण खर्च.", breakEven:"ब्रेक-इव्हन किंमत = एकूण खर्च ÷ विक्रीयोग्य उत्पादन.",
+fertNote:"प्रत्यक्ष खताच्या पिशवीवरील लेबल आणि स्थानिक शिफारस तपासा. DAP मधून नत्रही मिळते; हा साधा कॅल्क्युलेटर संपूर्ण संतुलित खत शिफारस तयार करत नाही."
+},
+hi:{
+calc:"कैलकुलेटर", unit:"इकाई", area:"क्षेत्रफल (एकड़)", seedRate:"बीज दर (किलो/एकड़)", row:"कतार दूरी (मीटर)", plant:"पौध दूरी (मीटर)",
+reqN:"आवश्यक नाइट्रोजन (किलो/एकड़)", reqP:"आवश्यक फास्फोरस (किलो/एकड़)", reqK:"आवश्यक पोटाश (किलो/एकड़)", product:"उर्वरक उत्पाद",
+dose:"प्रति एकड़ उत्पाद मात्रा (मिलीलीटर या ग्राम)", water:"प्रति एकड़ पानी (लीटर)", depth:"सिंचाई गहराई (मिमी)", yieldA:"प्रति एकड़ उपज (किलो)",
+price:"बिक्री मूल्य (₹/किलो)", costA:"प्रति एकड़ कुल लागत (₹)", benefit:"सकल लाभ / रिटर्न (₹)", totalCost:"कुल लागत (₹)",
+seedc:"बीज लागत (₹)", fertc:"उर्वरक लागत (₹)", pestc:"फसल सुरक्षा लागत (₹)", lab:"मजदूरी लागत (₹)", mach:"मशीनरी लागत (₹)", irrig:"सिंचाई लागत (₹)", other:"अन्य लागत (₹)",
+value:"मान", from:"से", to:"में", calculate:"गणना करें", convert:"बदलें", close:"बंद करें", planning:"योजना के लिए अनुमानित परिणाम।",
+quick:"त्वरित उपकरण", note:"फसल-विशिष्ट सिफारिशों को आधिकारिक/स्थानीय कृषि स्रोत से सत्यापित करें।",
+noData:"कृपया सही मान दर्ज करें.", acre:"एकड़", hectare:"हेक्टेयर", guntha:"गुंठा", sqm:"वर्ग मीटर", sqft:"वर्ग फुट",
+seedResult:"अनुमानित आवश्यक बीज.", populationResult:"अनुमानित पौध संख्या.", productResult:"चयनित पोषक तत्व के लिए अनुमानित उर्वरक मात्रा.",
+sprayResult:"कुल उत्पाद = क्षेत्रफल × लेबल डोज। कुल पानी = क्षेत्रफल × प्रति एकड़ पानी।", irrigationResult:"1 वर्ग मीटर पर 1 मिमी पानी = 1 लीटर। दक्षता और नुकसान शामिल नहीं हैं।",
+yieldResult:"अनुमानित फसल उपज.", profit:"लाभ", revenue:"आय", cost:"लागत", totalCult:"कुल खेती लागत.",
+bc:"B:C अनुपात = सकल लाभ ÷ कुल लागत।", breakEven:"ब्रेक-ईवन मूल्य = कुल लागत ÷ बिक्री योग्य उपज।",
+fertNote:"वास्तविक उत्पाद लेबल और स्थानीय सिफारिश देखें। DAP से नाइट्रोजन भी मिलता है; यह सरल कैलकुलेटर पूरी संतुलित उर्वरक सिफारिश नहीं बनाता।"
+}
+};
+function U(k){return UI[lang][k]||UI.en[k]||k}
+function toolName(t){return lang==="en"?t.en:lang==="mr"?t.mr:t.hi}
+function toolDesc(t){return lang==="en"?t.desc:lang==="mr"?t.descMr:t.descHi}
+function toolCat(t){return lang==="en"?t.cat:lang==="mr"?t.catMr:t.catHi}
+
+const tools=[
+{id:"seed",icon:"🌱",key:"seed",en:"Seed Rate Calculator",mr:"बियाणे दर कॅल्क्युलेटर",hi:"बीज दर कैलकुलेटर",desc:"Estimate seed required for a given area.",descMr:"दिलेल्या क्षेत्रासाठी आवश्यक बियाण्याचा अंदाज.",descHi:"दिए गए क्षेत्र के लिए आवश्यक बीज का अनुमान।",cat:"Seed & Planting",catMr:"बियाणे व लागवड",catHi:"बीज और बुवाई"},
+{id:"population",icon:"🌿",en:"Plant Population Calculator",mr:"रोपांची संख्या कॅल्क्युलेटर",hi:"पौध संख्या कैलकुलेटर",desc:"Estimate plants per area from spacing.",descMr:"अंतरावरून क्षेत्रातील रोपांची संख्या मोजा.",descHi:"दूरी के आधार पर क्षेत्र में पौधों की संख्या निकालें।",cat:"Seed & Planting",catMr:"बियाणे व लागवड",catHi:"बीज और बुवाई"},
+{id:"fertilizer",icon:"🧪",en:"Fertilizer / NPK Calculator",mr:"खत / NPK कॅल्क्युलेटर",hi:"उर्वरक / NPK कैलकुलेटर",desc:"Calculate nutrient requirement and fertilizer quantity.",descMr:"अन्नद्रव्याची गरज आणि खताचे प्रमाण मोजा.",descHi:"पोषक तत्व की जरूरत और उर्वरक मात्रा निकालें।",cat:"Inputs",catMr:"निविष्ठा",catHi:"इनपुट"},
+{id:"spray",icon:"💦",en:"Spray Dose Calculator",mr:"फवारणी डोस कॅल्क्युलेटर",hi:"स्प्रे डोज कैलकुलेटर",desc:"Calculate product quantity for a spray volume.",descMr:"फवारणीसाठी आवश्यक उत्पादनाचे प्रमाण मोजा.",descHi:"स्प्रे के लिए आवश्यक उत्पाद मात्रा निकालें।",cat:"Inputs",catMr:"निविष्ठा",catHi:"इनपुट"},
+{id:"irrigation",icon:"🚿",en:"Irrigation Calculator",mr:"सिंचन कॅल्क्युलेटर",hi:"सिंचाई कैलकुलेटर",desc:"Estimate irrigation water requirement.",descMr:"सिंचनासाठी आवश्यक पाण्याचा अंदाज.",descHi:"सिंचाई के लिए पानी की जरूरत का अनुमान।",cat:"Water",catMr:"पाणी",catHi:"पानी"},
+{id:"yield",icon:"🌾",en:"Crop Yield Calculator",mr:"पीक उत्पादन कॅल्क्युलेटर",hi:"फसल उपज कैलकुलेटर",desc:"Estimate total yield from area and yield per unit.",descMr:"क्षेत्रफळ आणि प्रति क्षेत्र उत्पादनावरून एकूण उत्पादन मोजा.",descHi:"क्षेत्रफल और प्रति इकाई उपज से कुल उपज निकालें।",cat:"Yield",catMr:"उत्पादन",catHi:"उपज"},
+{id:"profit",icon:"💰",en:"Crop Profit Calculator",mr:"पीक नफा कॅल्क्युलेटर",hi:"फसल लाभ कैलकुलेटर",desc:"Estimate revenue, cost and profit.",descMr:"उत्पन्न, खर्च आणि नफ्याचा अंदाज.",descHi:"आय, लागत और लाभ का अनुमान लगाएं।",cat:"Economics",catMr:"अर्थशास्त्र",catHi:"अर्थशास्त्र"},
+{id:"cost",icon:"🧾",en:"Cost of Cultivation Calculator",mr:"लागवड खर्च कॅल्क्युलेटर",hi:"खेती लागत कैलकुलेटर",desc:"Add major cultivation expenses.",descMr:"लागवडीचे प्रमुख खर्च जोडा.",descHi:"खेती के प्रमुख खर्च जोड़ें।",cat:"Economics",catMr:"अर्थशास्त्र",catHi:"अर्थशास्त्र"},
+{id:"bc",icon:"📊",en:"B:C Ratio Calculator",mr:"B:C गुणोत्तर कॅल्क्युलेटर",hi:"B:C अनुपात कैलकुलेटर",desc:"Benefit-cost ratio from returns and cost.",descMr:"परतावा आणि खर्चावरून B:C गुणोत्तर मोजा.",descHi:"रिटर्न और लागत से B:C अनुपात निकालें।",cat:"Economics",catMr:"अर्थशास्त्र",catHi:"अर्थशास्त्र"},
+{id:"land",icon:"📐",en:"Land Unit Converter",mr:"जमीन मोजमाप रूपांतरण",hi:"भूमि इकाई कन्वर्टर",desc:"Convert acre, hectare, guntha and square feet.",descMr:"एकर, हेक्टर, गुंठा आणि चौरस फूट यांचे रूपांतर करा.",descHi:"एकड़, हेक्टेयर, गुंठा और वर्ग फुट में बदलें।",cat:"Utilities",catMr:"उपयुक्त साधने",catHi:"उपयोगी उपकरण"}
+];
+
+const crops=[
+["🌿","Cotton","कापूस","कपास"],["🫘","Soybean","सोयाबीन","सोयाबीन"],["🧅","Onion","कांदा","प्याज"],["🌾","Wheat","गहू","गेहूं"],["🍅","Tomato","टोमॅटो","टमाटर"]
+];
+const guides=[
+["📅","Crop Planning Basics","पीक नियोजनाची मूलतत्त्वे","फसल योजना की मूल बातें"],
+["🌱","Seed & Planting Basics","बियाणे व लागवडीची मूलतत्त्वे","बीज और बुवाई की मूल बातें"],
+["🧪","Fertilizer Basics","खत व्यवस्थापनाची मूलतत्त्वे","उर्वरक प्रबंधन की मूल बातें"],
+["💧","Irrigation Basics","सिंचन व्यवस्थापन","सिंचाई प्रबंधन"],
+["💰","Farm Economics Basics","शेती अर्थशास्त्र","कृषि अर्थशास्त्र"]
+];
+
+let lang="en", current="";
+
+function textFor(t){return toolName(t)}
+function render(){
+const l=T[lang];
+document.querySelectorAll("[data-i18n]").forEach(e=>{const k=e.dataset.i18n;if(l[k])e.textContent=l[k]});
+document.getElementById("search").placeholder=l.search;
+document.getElementById("empty").textContent=l.no;
+renderTools();renderCrops();renderGuides();
+}
+function renderTools(filter=''){const q=filter.toLowerCase().trim();const list=tools.filter(x=>(toolName(x)+' '+x.en+' '+toolDesc(x)+' '+toolCat(x)).toLowerCase().includes(q));document.getElementById('toolsGrid').innerHTML=list.map(x=>`<div class="card" data-tool="${x.id}"><div class="icon">${x.icon}</div><h3>${toolName(x)}</h3><p>${toolDesc(x)}</p><span class="pill">${toolCat(x)}</span></div>`).join('');document.getElementById('empty').style.display=list.length?'none':'block';document.querySelectorAll('[data-tool]').forEach(el=>el.addEventListener('click',()=>openTool(el.dataset.tool)))}
+function renderCrops(){document.getElementById('cropGrid').innerHTML=crops.map(c=>`<div class="card crop" data-crop="${c[1]}"><div class="icon">${c[0]}</div><h3>${lang==='en'?c[1]:lang==='mr'?c[2]:c[3]}</h3><p>${lang==='en'?'Explore crop basics, inputs, irrigation, yield and economics.':lang==='mr'?'पीक मूलभूत माहिती, इनपुट, सिंचन, उत्पादन आणि अर्थशास्त्र.':'फसल की मूल बातें, इनपुट, सिंचाई, उपज और अर्थशास्त्र।'}</p></div>`).join('');document.querySelectorAll('[data-crop]').forEach(el=>el.addEventListener('click',()=>cropInfo(el.dataset.crop)))}
+function renderGuides(){document.getElementById('guideGrid').innerHTML=guides.map(g=>`<div class="card guide" data-guide="${g[1]}"><div class="icon">${g[0]}</div><h3>${lang==='en'?g[1]:lang==='mr'?g[2]:g[3]}</h3><p>${lang==='en'?'Practical, simple farming guidance.':lang==='mr'?'सोपे आणि व्यावहारिक शेती मार्गदर्शन.':'सरल और व्यावहारिक खेती मार्गदर्शन।'}</p></div>`).join('');document.querySelectorAll('[data-guide]').forEach(el=>el.addEventListener('click',()=>guideInfo(el.dataset.guide)))}
+document.getElementById("lang").addEventListener("change",e=>{lang=e.target.value;render();renderV2();});
+document.getElementById("search").addEventListener("input",e=>renderTools(e.target.value));
+
+function go(id){if(id==="home"){window.scrollTo({top:0,behavior:"smooth"});return}document.getElementById(id).scrollIntoView({behavior:"smooth"})}
+function closeModal(){document.getElementById("modal").classList.remove("show");current=""}
+function show(title,desc,body){document.getElementById("mTitle").textContent=title;document.getElementById("mDesc").textContent=desc||"";document.getElementById("form").innerHTML=body;document.getElementById("res").innerHTML="";document.getElementById("modal").classList.add("show")}
+function f(id,label,placeholder="0"){return `<div class="field"><label>${label}</label><input id="${id}" type="number" step="any" min="0" placeholder="${placeholder}"></div>`}
+function unit(id,opts){return `<div class="field"><label>${U("unit")}</label><select id="${id}">${opts.map(x=>`<option>${x}</option>`).join("")}</select></div>`}
+function calc(fn){try{const out=fn();document.getElementById("res").innerHTML=`<div class="result">${out}</div>`}catch(e){document.getElementById("res").innerHTML=`<div class="result error">${U("noData")}</div>`}}
+function val(id){return parseFloat(document.getElementById(id).value)||0}
+function money(n){return "₹"+n.toLocaleString("en-IN",{maximumFractionDigits:2})}
+
+function openTool(id){
+current=id; const x=tools.find(t=>t.id===id); const title=toolName(x);
+const button=`<button id="doCalc" class="calcbtn">${U('calculate')}</button>`;
+let body='';
+if(id==='seed') body=f('area',U('area'))+f('rate',U('seedRate'))+button;
+else if(id==='population') body=f('area',U('area'))+f('row',U('row'))+f('plant',U('plant'))+button;
+else if(id==='fertilizer') body=f('area',U('area'))+f('n',U('reqN'))+f('p',U('reqP'))+f('k',U('reqK'))+`<div class="note">${U('fertNote')}</div>`+unit('prod',lang==='en'?['Urea 46% N','DAP 18-46-0','MOP 0-0-60']:lang==='mr'?['युरिया 46% N','DAP 18-46-0','MOP 0-0-60']:['यूरिया 46% N','DAP 18-46-0','MOP 0-0-60'])+button;
+else if(id==='spray') body=f('area',U('area'))+f('dose',U('dose'))+f('water',U('water'))+button;
+else if(id==='irrigation') body=f('area',U('area'))+f('depth',U('depth'))+button;
+else if(id==='yield') body=f('area',U('area'))+f('yield',U('yieldA'))+button;
+else if(id==='profit') body=f('area',U('area'))+f('yield',U('yieldA'))+f('price',U('price'))+f('cost',U('costA'))+button;
+else if(id==='cost') body=f('seedc',U('seedc'))+f('fertc',U('fertc'))+f('pestc',U('pestc'))+f('lab',U('lab'))+f('mach',U('mach'))+f('irrig',U('irrig'))+f('other',U('other'))+button;
+else if(id==='bc') body=f('benefit',U('benefit'))+f('cost',U('totalCost'))+button;
+else if(id==='land') body=f('value',U('value'))+unit('from',[U('acre'),U('hectare'),U('guntha'),U('sqm'),U('sqft')])+unit('to',[U('acre'),U('hectare'),U('guntha'),U('sqm'),U('sqft')])+button;
+show(title,toolDesc(x),body);
+document.getElementById('doCalc').addEventListener('click',()=>calc(()=>{
+if(id==='seed') return `<strong>${(val('area')*val('rate')).toFixed(2)} kg</strong><div class="note">${U('seedResult')}</div>`;
+if(id==='population'){const n=(val('area')*4046.8564224)/(val('row')*val('plant'));if(!isFinite(n)||n<=0)throw 1;return `<strong>${Math.round(n).toLocaleString('en-IN')} ${lang==='en'?'plants':lang==='mr'?'रोपे':'पौधे'}</strong><div class="note">${U('populationResult')}</div>`;}
+if(id==='fertilizer'){const a=val('area'),p=document.getElementById('prod').value;let req;if(p.includes('Urea')||p.includes('युरिया')||p.includes('यूरिया'))req=val('n')*a/0.46;else if(p.startsWith('DAP'))req=val('p')*a/0.46;else req=val('k')*a/0.60;return `<strong>${req.toFixed(2)} kg</strong><div class="note">${U('productResult')}</div>`;}
+if(id==='spray')return `<strong>${(val('area')*val('dose')).toFixed(2)}</strong><div class="note">${U('sprayResult')}</div>`;
+if(id==='irrigation'){const litres=val('area')*4046.8564224*val('depth');return `<strong>${litres.toLocaleString('en-IN',{maximumFractionDigits:0})} L</strong><div class="note">${U('irrigationResult')}</div>`;}
+if(id==='yield')return `<strong>${(val('area')*val('yield')).toFixed(2)} kg</strong><div class="note">${U('yieldResult')}</div>`;
+if(id==='profit'){const rev=val('area')*val('yield')*val('price'),c=val('area')*val('cost');return `<strong>${U('profit')}: ${money(rev-c)}</strong><div>${U('revenue')}: ${money(rev)}<br>${U('cost')}: ${money(c)}</div>`;}
+if(id==='cost')return `<strong>${money(val('seedc')+val('fertc')+val('pestc')+val('lab')+val('mach')+val('irrig')+val('other'))}</strong><div class="note">${U('totalCult')}</div>`;
+if(id==='bc'){const c=val('cost');if(c<=0)throw 1;return `<strong>${(val('benefit')/c).toFixed(2)}:1</strong><div class="note">${U('bc')}</div>`;}
+if(id==='land'){const names=[U('acre'),U('hectare'),U('guntha'),U('sqm'),U('sqft')],vals=[1,0.404685642,40,4046.8564224,43560],map={};names.forEach((n,i)=>map[n]=vals[i]);const a=map[document.getElementById('from').value],b=map[document.getElementById('to').value];if(!a||!b)throw 1;return `<strong>${(val('value')*a/b).toLocaleString('en-IN',{maximumFractionDigits:6})}</strong>`;}
+throw 1;
+}));
+}
+
+function cropInfo(name){
+const C={
+Cotton:{icon:'🌿',en:'Cotton — Practical Crop Hub',mr:'🌿 कापूस — व्यावहारिक पीक माहिती',hi:'🌿 कपास — व्यावहारिक फसल जानकारी',season:{en:'Kharif crop',mr:'खरीप पीक',hi:'खरीफ फसल'},items:{en:[['Before sowing','Check drainage, previous crop, soil condition and irrigation. Choose the variety and planting system before buying inputs.'],['Seed & planting','Use quality/certified seed. Calculate seed requirement for the actual field area and keep sowing uniform.'],['Early crop stage','Check plant stand, weeds, moisture and early pest/disease symptoms. Record gaps early.'],['Nutrition','Use soil-test information and the local nutrient recommendation for the selected cotton system.'],['Water management','Plan irrigation around rainfall, soil and crop stage. Avoid prolonged waterlogging.'],['Crop protection','Scout before spraying. Identify the pest/disease and follow the registered product label, dose, safety and waiting period.'],['Harvest & quality','Pick mature cotton carefully and keep harvested kapas clean; contamination can reduce quality and value.'],['Economics','Track seed, fertilizer, labour, irrigation, machinery, crop protection, harvesting and transport costs.']],mr:[['पेरणीपूर्वी','निचरा, मागील पीक, माती आणि सिंचन तपासा. वाण व लागवड पद्धत आधी ठरवा.'],['बियाणे व लागवड','प्रमाणित/गुणवत्तापूर्ण बियाणे वापरा. प्रत्यक्ष क्षेत्रानुसार प्रमाण मोजा आणि समान पेरणी करा.'],['सुरुवातीची अवस्था','रोपांची संख्या, तण, ओलावा आणि किडी/रोगाची सुरुवातीची लक्षणे तपासा.'],['अन्नद्रव्ये','माती परीक्षण आणि स्थानिक शिफारसीनुसार खत व्यवस्थापन करा.'],['पाणी व्यवस्थापन','पाऊस, माती आणि पीक अवस्था पाहून सिंचन करा. पाणी साचू देऊ नका.'],['पीक संरक्षण','फवारणीपूर्वी पाहणी करा. किड/रोग ओळखून लेबलवरील डोस व सुरक्षा नियम पाळा.'],['काढणी व गुणवत्ता','योग्य वेळी कापूस वेचून स्वच्छ ठेवा. दूषितपणामुळे गुणवत्ता व मूल्य कमी होऊ शकते.'],['अर्थशास्त्र','बियाणे, खत, मजुरी, सिंचन, यंत्रसामग्री, पीक संरक्षण, काढणी व वाहतूक खर्च नोंदवा.']],hi:[['बुवाई से पहले','जल निकास, पिछली फसल, मिट्टी और सिंचाई देखें। पहले किस्म और बुवाई पद्धति तय करें।'],['बीज और बुवाई','गुणवत्तापूर्ण/प्रमाणित बीज लें। वास्तविक क्षेत्र के अनुसार बीज मात्रा निकालें और समान बुवाई करें।'],['शुरुआती अवस्था','पौध संख्या, खरपतवार, नमी और कीट/रोग के शुरुआती लक्षण देखें।'],['पोषण','मिट्टी जांच और स्थानीय सिफारिश के आधार पर पोषण प्रबंधन करें।'],['पानी प्रबंधन','बारिश, मिट्टी और फसल अवस्था के अनुसार सिंचाई करें। जलभराव से बचें।'],['फसल सुरक्षा','स्प्रे से पहले खेत की निगरानी करें। समस्या की पहचान कर लेबल के अनुसार उत्पाद इस्तेमाल करें।'],['कटाई व गुणवत्ता','उचित समय पर कपास चुनें और साफ रखें। गंदगी से गुणवत्ता और मूल्य कम हो सकता है।'],['अर्थशास्त्र','बीज, उर्वरक, मजदूरी, सिंचाई, मशीनरी, फसल सुरक्षा, कटाई और परिवहन लागत दर्ज करें.']]}},
+Soybean:{icon:'🫘',en:'Soybean — Practical Crop Hub',mr:'🫘 सोयाबीन — व्यावहारिक पीक माहिती',hi:'🫘 सोयाबीन — व्यावहारिक फसल जानकारी',season:{en:'Kharif crop',mr:'खरीप पीक',hi:'खरीफ फसल'}},
+Onion:{icon:'🧅',en:'Onion — Practical Crop Hub',mr:'🧅 कांदा — व्यावहारिक पीक माहिती',hi:'🧅 प्याज — व्यावहारिक फसल जानकारी',season:{en:'Production season varies by region and system',mr:'हंगाम प्रदेश व उत्पादन पद्धतीनुसार बदलतो',hi:'उत्पादन मौसम क्षेत्र और प्रणाली के अनुसार बदलता है'}},
+Wheat:{icon:'🌾',en:'Wheat — Practical Crop Hub',mr:'🌾 गहू — व्यावहारिक पीक माहिती',hi:'🌾 गेहूं — व्यावहारिक फसल जानकारी',season:{en:'Rabi crop',mr:'रब्बी पीक',hi:'रबी फसल'}},
+Tomato:{icon:'🍅',en:'Tomato — Practical Crop Hub',mr:'🍅 टोमॅटो — व्यावहारिक पीक माहिती',hi:'🍅 टमाटर — व्यावहारिक फसल जानकारी',season:{en:'Season and production system vary by region',mr:'हंगाम व उत्पादन पद्धत प्रदेशानुसार बदलते',hi:'मौसम और उत्पादन प्रणाली क्षेत्र के अनुसार बदलती है'}}
+};
+const generic={en:[['Seed & planting','Use crop/variety-specific seed guidance and calculate quantity for the actual area.'],['Nutrition','Use soil-test information and the local recommendation; do not treat a generic dose as universal.'],['Irrigation','Plan water from crop stage, soil, rainfall and irrigation method; avoid waterlogging.'],['Crop protection','Scout and identify the problem before using a registered product; follow its label.'],['Harvest & quality','Plan harvest for the target market and reduce handling losses.'],['Economics','Record inputs, labour, machinery, irrigation, harvest and marketing costs.']],mr:[['बियाणे व लागवड','पीक/वाणानुसार बियाणे शिफारस घ्या आणि प्रत्यक्ष क्षेत्रासाठी प्रमाण मोजा.'],['अन्नद्रव्ये','माती परीक्षण व स्थानिक शिफारसी वापरा; एकच डोस सर्वत्र लागू होत नाही.'],['सिंचन','पीक अवस्था, माती, पाऊस व सिंचन पद्धतीनुसार पाणी नियोजन करा; पाणी साचू देऊ नका.'],['पीक संरक्षण','फवारणीपूर्वी पाहणी व समस्या ओळखा; नोंदणीकृत उत्पादनाचे लेबल पाळा.'],['काढणी व गुणवत्ता','लक्ष्य बाजारानुसार काढणीचे नियोजन करा आणि हाताळणीतील नुकसान कमी करा.'],['अर्थशास्त्र','निविष्ठा, मजुरी, यंत्रसामग्री, सिंचन, काढणी व विक्री खर्च नोंदवा.']],hi:[['बीज और बुवाई','फसल/किस्म के अनुसार बीज सिफारिश लें और वास्तविक क्षेत्र के लिए मात्रा निकालें.'],['पोषण','मिट्टी जांच और स्थानीय सिफारिश का उपयोग करें; कोई एक डोज हर जगह लागू नहीं होता.'],['सिंचाई','फसल अवस्था, मिट्टी, बारिश और सिंचाई पद्धति के आधार पर पानी दें; जलभराव से बचें.'],['फसल सुरक्षा','स्प्रे से पहले निगरानी और पहचान करें; पंजीकृत उत्पाद का लेबल मानें.'],['कटाई व गुणवत्ता','लक्ष्य बाजार के अनुसार कटाई की योजना बनाएं और संभालने का नुकसान कम करें.'],['अर्थशास्त्र','इनपुट, मजदूरी, मशीनरी, सिंचाई, कटाई और बिक्री लागत दर्ज करें.']]};
+const d=C[name]; const arr=(d.items&&d.items[lang])||generic[lang]||generic.en; let body=`<div class="result"><strong>${d.season[lang]||d.season.en}</strong><p style="margin-top:8px">${lang==='en'?'Practical crop information for field planning and records.':lang==='mr'?'नियोजन आणि शेत नोंदींसाठी व्यावहारिक पीक माहिती.':'योजना और खेत के रिकॉर्ड के लिए व्यावहारिक फसल जानकारी।'}</p>`;
+arr.forEach(x=>body+=`<div style="margin:15px 0"><b>${x[0]}</b><p style="margin:5px 0 0">${x[1]}</p></div>`);
+body+=`<hr><p><b>${U('quick')}:</b> ${tools.map(toolName).join(' • ')}</p><div class="note">${U('note')}</div></div>`; show(d[lang],lang==='en'?'Crop hub':lang==='mr'?'पीक माहिती':'फसल जानकारी',body);
+}
+
+function guideInfo(name){
+const G={
+'Crop Planning Basics':{en:['Crop planning starts with the field, not a generic crop list.','Write area, soil, irrigation, previous crop and target market. Build an input budget and field calendar. Calculate cost, expected yield, revenue, profit, B:C and break-even. List major risks and one action for each.'],mr:['पीक नियोजन शेतापासून सुरू होते.','क्षेत्रफळ, माती, सिंचन, मागील पीक आणि लक्ष्य बाजार नोंदवा. निविष्ठांचा अंदाज व शेत कॅलेंडर तयार करा. खर्च, उत्पादन, उत्पन्न, नफा, B:C आणि ब्रेक-इव्हन मोजा. प्रमुख जोखमी आणि प्रत्येकासाठी एक उपाय लिहा.'],hi:['फसल योजना खेत से शुरू होती है.','क्षेत्रफल, मिट्टी, सिंचाई, पिछली फसल और लक्ष्य बाजार लिखें। इनपुट बजट और खेत कैलेंडर बनाएं। लागत, उपज, आय, लाभ, B:C और ब्रेक-ईवन निकालें। प्रमुख जोखिम और उनका एक उपाय लिखें.']},
+'Seed & Planting Basics':{en:['The useful question is how much seed this exact field and planting system needs.','Convert area correctly. Use the selected crop/variety recommendation or certified seed label. Check spacing, seed quality and planting method. Record variety, seed lot, treatment, quantity, date and area.'],mr:['या शेतासाठी आणि लागवड पद्धतीसाठी नेमके किती बियाणे लागेल हे महत्त्वाचे आहे.','क्षेत्रफळ अचूक रूपांतरित करा. पीक/वाणाची शिफारस किंवा प्रमाणित बियाण्याचे लेबल वापरा. अंतर, बियाण्याची गुणवत्ता व लागवड पद्धत तपासा. वाण, लॉट, प्रक्रिया, प्रमाण, तारीख व क्षेत्र नोंदवा.'],hi:['इस खेत और बुवाई पद्धति के लिए कितने बीज की जरूरत है, यह महत्वपूर्ण है.','क्षेत्रफल सही बदलें। फसल/किस्म की सिफारिश या प्रमाणित बीज लेबल देखें। दूरी, बीज गुणवत्ता और बुवाई पद्धति जांचें। किस्म, लॉट, उपचार, मात्रा, तारीख और क्षेत्र दर्ज करें.']},
+'Fertilizer Basics':{en:['Fertilizer calculation should start from nutrient requirement, not the bag.','Get crop/soil-based N, P₂O₅ and K₂O recommendations. Read actual product analysis. Product quantity = nutrient required ÷ nutrient fraction. Example: 46 kg N ÷ 0.46 = 100 kg urea. For compound fertilizers such as DAP, account for every nutrient supplied.'],mr:['खताची गणना खताच्या पिशवीपासून नव्हे तर अन्नद्रव्यांच्या गरजेपासून सुरू करा.','पीक व मातीवर आधारित N, P₂O₅ आणि K₂O शिफारस घ्या. खताचे विश्लेषण वाचा. खताचे प्रमाण = आवश्यक अन्नद्रव्य ÷ अन्नद्रव्याचा अंश. उदाहरण: 46 किलो N ÷ 0.46 = 100 किलो युरिया. DAP सारख्या मिश्र खतांतील सर्व अन्नद्रव्ये लक्षात घ्या.'],hi:['उर्वरक गणना पोषक तत्व की जरूरत से शुरू करें, बोरी से नहीं.','फसल और मिट्टी के अनुसार N, P₂O₅ और K₂O की सिफारिश लें। उत्पाद विश्लेषण पढ़ें। उर्वरक मात्रा = आवश्यक पोषक तत्व ÷ पोषक तत्व का अंश। उदाहरण: 46 किलो N ÷ 0.46 = 100 किलो यूरिया। DAP जैसे मिश्रित उर्वरक में सभी पोषक तत्वों को ध्यान में रखें.']},
+'Irrigation Basics':{en:['Good irrigation planning combines crop stage, soil, rainfall, area and efficiency.','1 mm over 1 m² equals 1 litre. So 10 mm over 1 acre is about 40,469 litres before losses. Check soil moisture and recent rainfall before irrigating. Record date, duration, volume and crop stage.'],mr:['चांगले सिंचन नियोजन पीक अवस्था, माती, पाऊस, क्षेत्रफळ आणि कार्यक्षमता एकत्र पाहते.','1 चौरस मीटरवर 1 मि.मी. पाणी = 1 लिटर. त्यामुळे 1 एकरावर 10 मि.मी. पाणी साधारण 40,469 लिटर होते; प्रत्यक्ष नुकसान वेगळे असते. सिंचनापूर्वी मातीतील ओलावा व पाऊस तपासा. तारीख, कालावधी, पाणी व पीक अवस्था नोंदवा.'],hi:['अच्छी सिंचाई योजना फसल अवस्था, मिट्टी, बारिश, क्षेत्रफल और दक्षता को साथ देखती है.','1 वर्ग मीटर पर 1 मिमी पानी = 1 लीटर। इसलिए 1 एकड़ पर 10 मिमी पानी लगभग 40,469 लीटर है; वास्तविक नुकसान अलग होगा। सिंचाई से पहले मिट्टी की नमी और हाल की बारिश देखें। तारीख, अवधि, पानी और फसल अवस्था दर्ज करें.']},
+'Farm Economics Basics':{en:['Farm economics should show what the field returns after relevant costs.','Record seed, fertilizer, crop protection, labour, machinery, irrigation, harvesting and transport. Revenue = marketable yield × price. Profit = revenue − total cost. B:C = benefit ÷ cost. Break-even price = total cost ÷ marketable yield. Test low, expected and high price scenarios.'],mr:['शेती अर्थशास्त्राने सर्व संबंधित खर्चानंतर शेतातून किती परतावा मिळतो हे दाखवावे.','बियाणे, खत, पीक संरक्षण, मजुरी, यंत्रसामग्री, सिंचन, काढणी व वाहतूक नोंदवा. उत्पन्न = विक्रीयोग्य उत्पादन × किंमत. नफा = उत्पन्न − एकूण खर्च. B:C = परतावा ÷ खर्च. ब्रेक-इव्हन किंमत = एकूण खर्च ÷ विक्रीयोग्य उत्पादन. कमी, अपेक्षित आणि जास्त किंमतीचे परिदृश्य तपासा.'],hi:['कृषि अर्थशास्त्र को सभी जरूरी लागत के बाद खेत का रिटर्न दिखाना चाहिए.','बीज, उर्वरक, फसल सुरक्षा, मजदूरी, मशीनरी, सिंचाई, कटाई और परिवहन दर्ज करें। आय = बिक्री योग्य उपज × कीमत। लाभ = आय − कुल लागत। B:C = लाभ ÷ लागत। ब्रेक-ईवन मूल्य = कुल लागत ÷ बिक्री योग्य उपज। कम, अपेक्षित और अधिक कीमत के परिदृश्य जांचें.']}}
+const d=G[name]||G['Crop Planning Basics'], x=d[lang]||d.en; show(name,lang==='en'?'Farmlytic guide':lang==='mr'?'Farmlytic मार्गदर्शक':'Farmlytic गाइड',`<div class="result"><strong>${lang==='en'?'Practical guide':lang==='mr'?'व्यावहारिक मार्गदर्शक':'व्यावहारिक गाइड'}</strong><p style="margin-top:10px">${x[0]}</p><p>${x[1]}</p><hr><p><b>${U('quick')}:</b> ${tools.map(toolName).join(' • ')}</p><div class="note">${U('note')}</div></div>`)
+}
+
+render();
+
+/* ================= FARM LY TIC V2 ================= */
+const V2_CROPS = {
+  Cotton:{
+    icon:"🌿",
+    intro:"Use the crop hub to connect field observations with calculations and records.",
+    stages:[
+      ["Pre-sowing","Confirm field drainage, crop history, variety/planting system, seed requirement and input budget."],
+      ["Establishment","Check emergence, gaps, weeds and moisture early. Record field observations instead of relying on memory."],
+      ["Vegetative / flowering","Track crop condition, irrigation, nutrient operations and pest/disease scouting. Do not spray solely from a calendar."],
+      ["Boll development","Watch water stress, pest pressure and crop load. Keep input and labour records updated."],
+      ["Harvest","Record harvested quantity, marketable quantity, quality issues and selling details."]
+    ]
+  },
+  Soybean:{
+    icon:"🫘",intro:"Soybean planning should connect planting, stand, moisture, weeds, scouting and economics.",
+    stages:[
+      ["Pre-sowing","Check drainage, seed quality, sowing window and the locally recommended seed treatment/inoculation practice."],
+      ["Emergence","Check plant stand and missing patches. Use the plant-population calculator with actual spacing."],
+      ["Vegetative","Scout weeds and crop condition. Record rainfall/irrigation and nutrient operations."],
+      ["Reproductive","Watch moisture and pest/disease symptoms. Diagnose before choosing a crop-protection product."],
+      ["Harvest","Record harvest date, grain quantity, cleaning loss, marketable quantity and sale price."]
+    ]
+  },
+  Onion:{
+    icon:"🧅",intro:"Onion management is highly dependent on season, variety, nursery/transplanting system and moisture consistency.",
+    stages:[
+      ["Nursery","Plan seed quantity and healthy seedling production for the final field area."],
+      ["Transplanting","Use healthy seedlings and the recommended spacing for the selected system."],
+      ["Vegetative growth","Maintain appropriate moisture and monitor weeds, nutrient status and crop health."],
+      ["Bulb development","Avoid severe moisture swings and monitor disease/pest symptoms closely."],
+      ["Harvest & storage","Harvest at the appropriate maturity for the target market; grade and record storage/handling losses."]
+    ]
+  },
+  Wheat:{
+    icon:"🌾",intro:"Wheat decisions vary by region, variety, sowing condition, irrigation and temperature.",
+    stages:[
+      ["Pre-sowing","Choose a locally suitable variety and sowing window. Plan seed, fertilizer, irrigation and machinery."],
+      ["Germination","Check emergence and uniformity. Investigate gaps early."],
+      ["Tillering","Monitor weeds, nutrient status and soil moisture. Keep irrigation records."],
+      ["Critical reproductive stages","Plan irrigation around locally recommended critical stages and actual field conditions."],
+      ["Harvest","Minimize shattering and handling losses; record grain yield and quality."]
+    ]
+  },
+  Tomato:{
+    icon:"🍅",intro:"Tomato planning needs a market plan because yield alone does not equal marketable return.",
+    stages:[
+      ["Nursery","Select variety/hybrid for season, climate, disease pressure and target market."],
+      ["Transplanting","Use healthy, hardened seedlings and the recommended spacing for the system."],
+      ["Vegetative","Plan irrigation, nutrition, staking and crop scouting. Record labour/material costs."],
+      ["Flowering & fruiting","Monitor moisture consistency, pests, diseases and fruit quality."],
+      ["Harvest & marketing","Grade produce, track rejected fruit, transport and actual sale price."]
+    ]
+  },
+  Potato:{
+    icon:"🥔",intro:"Potato planning links seed tuber quality, planting condition, irrigation, nutrition and harvest losses.",
+    stages:[["Before planting","Check seed tuber quality, field condition, drainage and planting budget."],["Establishment","Monitor emergence and uniform stand."],["Tuber initiation","Track moisture and nutrition according to local recommendation."],["Bulking","Avoid severe water stress and inspect crop health."],["Harvest","Record harvested, marketable and damaged quantities separately."]]
+  },
+  Chickpea:{
+    icon:"🫘",intro:"Chickpea performance is strongly affected by sowing conditions, stand, moisture and disease monitoring.",
+    stages:[["Before sowing","Choose suitable variety and sowing window; check seed quality and field condition."],["Establishment","Check emergence, plant stand and early weed pressure."],["Vegetative","Monitor moisture and crop health; record field operations."],["Flowering/pod setting","Watch moisture and disease symptoms, especially when weather is conducive."],["Harvest","Record yield, grain quality and cleaning losses."]]
+  },
+  Maize:{
+    icon:"🌽",intro:"Maize planning benefits from uniform stand, timely water, nutrient management and stage-based scouting.",
+    stages:[["Before sowing","Plan hybrid/variety, seed rate, spacing, fertilizer and irrigation."],["Early growth","Check emergence, gaps and weeds."],["Vegetative","Monitor crop growth, moisture and nutrient status."],["Tasseling/silking","Protect the crop from major moisture stress and monitor pests/disease."],["Harvest","Record grain yield, moisture/quality and post-harvest losses."]]
+  }
+};
+
+const V2_GUIDES = [
+  {cat:"Planning",title:"How to Build a 1-Acre Farm Budget",icon:"🧾",text:"Start with area, list every field cost, estimate marketable yield, enter a realistic selling price, then calculate revenue, profit, B:C and break-even. Keep actual expenses beside the estimate."},
+  {cat:"Planning",title:"How to Read a Farm Calculation",icon:"🔎",text:"Every calculator result has assumptions. Check the unit, area, input rate, product concentration, yield basis and price basis before using the number for a real decision."},
+  {cat:"Inputs",title:"NPK Is Not the Same as Fertilizer Quantity",icon:"🧪",text:"N, P₂O₅ and K₂O are nutrient quantities. Fertilizer products contain those nutrients at specific percentages. Convert nutrient need to product quantity only after checking the actual product analysis."},
+  {cat:"Inputs",title:"How to Plan Spray Water",icon:"💦",text:"Separate product dose from spray-water volume. Use the registered product label and sprayer capacity; then estimate how many full tanks are required for the field."},
+  {cat:"Water",title:"Irrigation: mm to Litres",icon:"🚿",text:"1 mm over 1 square metre equals 1 litre. Convert field area to square metres before estimating volume. Actual water delivered to the crop also depends on irrigation efficiency and field conditions."},
+  {cat:"Yield",title:"Marketable Yield vs Total Harvest",icon:"🌾",text:"Economic calculations should use marketable quantity, not only total harvested quantity. Separate damaged, rejected, storage and handling losses so revenue is not overstated."},
+  {cat:"Economics",title:"Profit vs B:C Ratio",icon:"📊",text:"Profit is an amount of money. B:C is a ratio of benefit to cost. Both should be calculated from the same cost and revenue assumptions."},
+  {cat:"Economics",title:"Break-even Price and Break-even Yield",icon:"⚖️",text:"Break-even price is total cost divided by marketable yield. Break-even yield is total cost divided by expected selling price. They help you understand the minimum requirement to cover cost."},
+  {cat:"Records",title:"What a Farmer Should Record",icon:"📋",text:"Area, crop, variety, dates, seed, fertilizer, irrigation, crop-protection operations, labour, machinery, harvest quantity, marketable quantity and sale price create a useful season history."},
+  {cat:"Records",title:"Turn Farm Records Into Next-Season Decisions",icon:"📈",text:"Compare estimated vs actual cost, yield and price. Identify the largest cost items and biggest sources of loss, then use those observations when planning the next crop."}
+];
+
+const V2_TOOL_DEFS = [
+  {id:"breakEven",icon:"⚖️",title:"Break-even Calculator",cat:"Economics",desc:"Minimum selling price or yield needed to cover total cost."},
+  {id:"farmBudget",icon:"🧾",title:"Farm Input Budget",cat:"Economics",desc:"Combine up to seven major farm costs into one budget."},
+  {id:"revenueV2",icon:"💵",title:"Market Revenue",cat:"Economics",desc:"Revenue based on marketable yield and selling price."},
+  {id:"seedCostV2",icon:"🌱",title:"Seed Cost",cat:"Inputs",desc:"Seed quantity × price, with a clear cost result."},
+  {id:"sprayTankV2",icon:"🪣",title:"Spray Tank Planner",cat:"Inputs",desc:"Estimate the number of tank loads for a field."},
+  {id:"labourV2",icon:"👨‍🌾",title:"Labour Cost",cat:"Costs",desc:"Workers × hours × hourly rate."},
+  {id:"machineryV2",icon:"🚜",title:"Machinery Cost",cat:"Costs",desc:"Machine hours × hourly rate."},
+  {id:"lossV2",icon:"📉",title:"Harvest Loss",cat:"Yield",desc:"Separate harvested quantity from marketable quantity."},
+  {id:"yieldConvertV2",icon:"⚖️",title:"Yield Converter",cat:"Utilities",desc:"Convert kg, quintal and tonne."},
+  {id:"areaPlanV2",icon:"📐",title:"Area Planning",cat:"Utilities",desc:"Estimate plant count from area and spacing."}
+];
+
+function v2Lang(){
+  return lang==="mr"?{
+    planning:"शेती नियोजन",crop:"पीक माहिती",knowledge:"ज्ञान केंद्र",tools:"अॅडव्हान्स शेती साधने",economics:"शेती अर्थशास्त्र",
+    planningSub:"क्षेत्रफळापासून उत्पादन, खर्च आणि जोखमीपर्यंत नियोजन करा.",cropSub:"पीक अवस्था, निरीक्षणे आणि नोंदी यांना गणनांशी जोडा.",
+    knowledgeSub:"शेतकऱ्यांना वारंवार लागणाऱ्या निर्णयांसाठी व्यावहारिक माहिती.",toolsSub:"प्रत्यक्ष शेती कामांनुसार नवीन साधने.",economicsSub:"किंमत, उत्पादन आणि खर्च बदलल्यावर निकाल कसा बदलतो ते पहा.",
+    all:"सर्व",planningCat:"नियोजन",inputs:"निविष्ठा",water:"पाणी",yield:"उत्पादन",economicsCat:"अर्थशास्त्र",records:"नोंदी",costs:"खर्च",utilities:"उपयुक्त साधने",
+    field:"शेत",stages:"पीक अवस्था",related:"संबंधित साधने",read:"वाचा",calc:"गणना करा"
+  }:lang==="hi"?{
+    planning:"फार्म प्लानिंग",crop:"फसल जानकारी",knowledge:"ज्ञान केंद्र",tools:"एडवांस कृषि उपकरण",economics:"कृषि अर्थशास्त्र",
+    planningSub:"क्षेत्रफल से उपज, लागत और जोखिम तक योजना बनाएं.",cropSub:"फसल अवस्था, निरीक्षण और रिकॉर्ड को गणनाओं से जोड़ें.",
+    knowledgeSub:"किसानों के बार-बार आने वाले फैसलों के लिए व्यावहारिक जानकारी.",toolsSub:"वास्तविक खेती के कामों के अनुसार नए उपकरण.",economicsSub:"कीमत, उपज और लागत बदलने पर परिणाम कैसे बदलता है देखें.",
+    all:"सभी",planningCat:"योजना",inputs:"इनपुट",water:"पानी",yield:"उपज",economicsCat:"अर्थशास्त्र",records:"रिकॉर्ड",costs:"लागत",utilities:"उपयोगी उपकरण",
+    field:"खेत",stages:"फसल अवस्था",related:"संबंधित उपकरण",read:"पढ़ें",calc:"गणना करें"
+  }:{
+    planning:"Farm Planning",crop:"Crop Intelligence",knowledge:"Knowledge Center",tools:"Advanced Farm Tools",economics:"Farm Economics Lab",
+    planningSub:"Plan from field area to yield, cost and risk.",cropSub:"Connect crop stages, observations and records with calculations.",
+    knowledgeSub:"Practical information for decisions farmers make repeatedly.",toolsSub:"New tools organized around real farm tasks.",economicsSub:"See how price, yield and cost assumptions change the result.",
+    all:"All",planningCat:"Planning",inputs:"Inputs",water:"Water",yield:"Yield",economicsCat:"Economics",records:"Records",costs:"Costs",utilities:"Utilities",
+    field:"Field",stages:"Crop stages",related:"Related tools",read:"Read",calc:"Calculate"
+  };
+}
+
+function v2TextForCrop(name){
+  const c=V2_CROPS[name]; if(!c) return null;
+  const map = {
+    Cotton:["कापूस","कपास"],Soybean:["सोयाबीन","सोयाबीन"],Onion:["कांदा","प्याज"],Wheat:["गहू","गेहूं"],Tomato:["टोमॅटो","टमाटर"],
+    Potato:["बटाटा","आलू"],Chickpea:["हरभरा","चना"],Maize:["मका","मक्का"]
+  };
+  return lang==="en"?name:(map[name]||[name,name])[lang==="mr"?0:1];
+}
+
+function renderV2(){
+  const L=v2Lang();
+  document.querySelector("#farmplanning h2").childNodes[0].textContent=L.planning+" ";
+  document.querySelector("#farmplanning .sub").textContent=L.planningSub;
+  document.querySelector("#cropintel h2").childNodes[0].textContent=L.crop+" ";
+  document.querySelector("#cropintel .sub").textContent=L.cropSub;
+  document.querySelector("#knowledge h2").childNodes[0].textContent=L.knowledge+" ";
+  document.querySelector("#knowledge .sub").textContent=L.knowledgeSub;
+  document.querySelector("#v2tools h2").childNodes[0].textContent=L.tools+" ";
+  document.querySelector("#v2tools .sub").textContent=L.toolsSub;
+  document.querySelector("#v2economics h2").childNodes[0].textContent=L.economics+" ";
+  document.querySelector("#v2economics .sub").textContent=L.economicsSub;
+  const ecoLabels=lang==='mr'?{rev:"महसूल",cost:"एकूण खर्च",profit:"नफा",yield:"विक्रीयोग्य उत्पादन (kg)",price:"अपेक्षित किंमत (₹/kg)",costIn:"एकूण खर्च (₹)",update:"परिस्थिती अपडेट करा",low:"कमी किंमत",high:"जास्त किंमत"}:lang==='hi'?{rev:"राजस्व",cost:"कुल लागत",profit:"लाभ",yield:"बिक्री योग्य उपज (kg)",price:"अपेक्षित कीमत (₹/kg)",costIn:"कुल लागत (₹)",update:"स्थिति अपडेट करें",low:"कम कीमत",high:"ज्यादा कीमत"}:{rev:"Revenue",cost:"Total cost",profit:"Profit",yield:"Marketable yield (kg)",price:"Expected price (₹/kg)",costIn:"Total cost (₹)",update:"Update Scenario",low:"Low price",high:"High price"};
+  const ecoCard=document.querySelector('#v2economics .v2-panel'); if(ecoCard){const labels=ecoCard.querySelectorAll('.v2-stat .v2-note'); if(labels.length>=3){labels[0].textContent=ecoLabels.rev;labels[1].textContent=ecoLabels.cost;labels[2].textContent=ecoLabels.profit;} const fs=ecoCard.querySelectorAll('.field label'); if(fs.length>=3){fs[0].textContent=ecoLabels.yield;fs[1].textContent=ecoLabels.price;fs[2].textContent=ecoLabels.costIn;} const bs=ecoCard.querySelectorAll('.v2-actions button'); if(bs.length>=3){bs[0].textContent=ecoLabels.update;bs[1].textContent=ecoLabels.low;bs[2].textContent=ecoLabels.high;}}
+
+
+  const cropNames=Object.keys(V2_CROPS);
+  document.getElementById("cropIntelFilter").innerHTML=`<button type="button" class="active" data-cropfilter="all">${L.all}</button>`+
+    cropNames.map(n=>`<button type="button" data-cropfilter="${n}">${V2_CROPS[n].icon} ${v2TextForCrop(n)}</button>`).join("");
+  document.querySelectorAll("[data-cropfilter]").forEach(b=>b.addEventListener("click",()=>renderCropIntel(b.dataset.cropfilter)));
+
+  const cats=[L.all,L.planningCat,L.inputs,L.water,L.yield,L.economicsCat,L.records,L.costs,L.utilities];
+  document.getElementById("knowledgeFilter").innerHTML=cats.map((c,i)=>`<button type="button" class="${i===0?"active":""}" data-kfilter="${c}">${c}</button>`).join("");
+  document.querySelectorAll("[data-kfilter]").forEach(b=>b.addEventListener("click",()=>renderKnowledge(b.dataset.kfilter)));
+
+  document.getElementById("v2ToolFilter").innerHTML=cats.map((c,i)=>`<button type="button" class="${i===0?"active":""}" data-tfilter="${c}">${c}</button>`).join("");
+  document.querySelectorAll("[data-tfilter]").forEach(b=>b.addEventListener("click",()=>renderV2Tools(b.dataset.tfilter)));
+
+  renderCropIntel("all"); renderKnowledge(L.all); renderV2Tools(L.all); runEco();
+}
+
+const V2_TRANSLATIONS = {
+  "Use the crop hub to connect field observations with calculations and records.": ["पीक हब वापरून शेतातील निरीक्षणे गणना आणि नोंदींशी जोडा.","फसल हब से खेत के निरीक्षणों को गणना और रिकॉर्ड से जोड़ें."],
+  "Record field observations instead of relying on memory.": ["फक्त लक्षात ठेवण्याऐवजी शेतातील निरीक्षणांची नोंद ठेवा.","सिर्फ याद रखने के बजाय खेत के निरीक्षणों का रिकॉर्ड रखें."],
+  "Use these records with Farmlytic calculators.": ["या नोंदी Farmlytic कॅल्क्युलेटरसोबत वापरा.","इन रिकॉर्ड को Farmlytic कैलकुलेटर के साथ इस्तेमाल करें."],
+  "Use the information as a planning aid. Crop-specific rates, product doses and schedules should be verified against current official/local agricultural recommendations.":["ही माहिती नियोजनासाठी मदत म्हणून वापरा. पीकनिहाय मात्रा, उत्पादनाचे डोस आणि वेळापत्रक सध्याच्या अधिकृत/स्थानिक कृषी शिफारशींनुसार तपासा.","इस जानकारी का उपयोग योजना बनाने में सहायता के रूप में करें। फसल-विशिष्ट मात्रा, उत्पाद डोज और समय-सारणी को वर्तमान आधिकारिक/स्थानीय कृषि सिफारिशों से जांचें."],
+  "Current assumptions produce a positive planning margin.":["सध्याच्या गृहितकांनुसार नियोजनातील मार्जिन सकारात्मक आहे.","वर्तमान मान्यताओं के अनुसार योजना का मार्जिन सकारात्मक है."],
+  "Current assumptions are below total cost; review price, yield or cost assumptions.":["सध्याचे गृहितक एकूण खर्चापेक्षा कमी आहेत; किंमत, उत्पादन किंवा खर्चाची गृहितके पुन्हा तपासा.","वर्तमान मान्यताएं कुल लागत से कम हैं; कीमत, उपज या लागत की मान्यताओं की समीक्षा करें."],
+  "Total planned farm input/cultivation cost.":["एकूण नियोजित शेती/निविष्ठा खर्च.","कुल नियोजित खेती/इनपुट लागत."],
+  "Revenue = marketable yield × selling price.":["महसूल = विक्रीयोग्य उत्पादन × विक्री किंमत.","राजस्व = बिक्री योग्य उपज × बिक्री कीमत."],
+  "Seed cost = quantity × price.":["बियाणे खर्च = प्रमाण × किंमत.","बीज लागत = मात्रा × कीमत."],
+  "Workers × hours × hourly rate.":["कामगार × तास × प्रति तास दर.","कामगार × घंटे × प्रति घंटा दर."],
+  "Machine hours × hourly rate.":["यंत्राचे तास × प्रति तास दर.","मशीन घंटे × प्रति घंटा दर."],
+  "Theoretical population from area and spacing.":["क्षेत्रफळ आणि अंतरावर आधारित सैद्धांतिक रोपसंख्या.","क्षेत्रफल और दूरी के आधार पर सैद्धांतिक पौध संख्या."],
+  "Minimum selling price or yield needed to cover total cost.":["एकूण खर्च भरून काढण्यासाठी आवश्यक किमान विक्री किंमत किंवा उत्पादन.","कुल लागत को पूरा करने के लिए आवश्यक न्यूनतम बिक्री कीमत या उपज."],
+  "Combine up to seven major farm costs into one budget.":["सात प्रमुख शेती खर्च एकाच बजेटमध्ये एकत्र करा.","सात प्रमुख खेती लागतों को एक बजट में जोड़ें."],
+  "Revenue based on marketable yield and selling price.":["विक्रीयोग्य उत्पादन आणि विक्री किमतीवर आधारित महसूल.","बिक्री योग्य उपज और बिक्री कीमत पर आधारित राजस्व."],
+  "Seed quantity × price, with a clear cost result.":["बियाण्याचे प्रमाण × किंमत, स्पष्ट खर्चासह.","बीज मात्रा × कीमत, स्पष्ट लागत परिणाम के साथ."],
+  "Estimate the number of tank loads for a field.":["शेतासाठी आवश्यक फवारणी टाक्यांची संख्या अंदाजे काढा.","खेत के लिए आवश्यक टैंक लोड की संख्या का अनुमान लगाएं."],
+  "Separate harvested quantity from marketable quantity.":["एकूण कापणी आणि विक्रीयोग्य उत्पादन वेगळे मोजा.","कुल कटाई और बिक्री योग्य उपज को अलग-अलग मापें."],
+  "Convert kg, quintal and tonne.":["किलो, क्विंटल आणि टन यांचे रूपांतर करा.","किलो, क्विंटल और टन में रूपांतरण करें."],
+  "Estimate plant count from area and spacing.":["क्षेत्रफळ आणि अंतरावरून रोपांची संख्या अंदाजे काढा.","क्षेत्रफल और दूरी से पौधों की संख्या का अनुमान लगाएं."]
+};
+function v2tx(en){ if(lang==='en') return en; return (V2_TRANSLATIONS[en]||[en,en])[lang==='mr'?0:1]; }
+const V2_TOOL_TR = {
+ breakEven:["ब्रेक-इव्हन कॅल्क्युलेटर","ब्रेक-ईवन कैलकुलेटर"], farmBudget:["शेती इनपुट बजेट","फार्म इनपुट बजट"], revenueV2:["बाजार महसूल","बाजार राजस्व"], seedCostV2:["बियाणे खर्च","बीज लागत"], sprayTankV2:["फवारणी टाकी नियोजक","स्प्रे टैंक प्लानर"], labourV2:["मजुरी खर्च","मजदूरी लागत"], machineryV2:["यंत्रसामग्री खर्च","मशीनरी लागत"], lossV2:["कापणीतील नुकसान","कटाई नुकसान"], yieldConvertV2:["उत्पादन रूपांतरक","उपज कन्वर्टर"], areaPlanV2:["क्षेत्र नियोजन","क्षेत्र योजना"]
+};
+const V2_TOOL_DESC_TR = {
+ breakEven:["एकूण खर्च भरून काढण्यासाठी आवश्यक किमान विक्री किंमत किंवा उत्पादन.","कुल लागत को पूरा करने के लिए आवश्यक न्यूनतम बिक्री कीमत या उपज."],
+ farmBudget:["सात प्रमुख शेती खर्च एकाच बजेटमध्ये एकत्र करा.","सात प्रमुख खेती लागतों को एक बजट में जोड़ें."],
+ revenueV2:["विक्रीयोग्य उत्पादन आणि विक्री किमतीवर आधारित महसूल.","बिक्री योग्य उपज और बिक्री कीमत पर आधारित राजस्व."],
+ seedCostV2:["बियाण्याचे प्रमाण × किंमत, स्पष्ट खर्चासह.","बीज मात्रा × कीमत, स्पष्ट लागत परिणाम के साथ."],
+ sprayTankV2:["शेतासाठी आवश्यक फवारणी टाक्यांची संख्या अंदाजे काढा.","खेत के लिए आवश्यक टैंक लोड की संख्या का अनुमान लगाएं."],
+ labourV2:["कामगार, तास आणि प्रति तास दरावर आधारित मजुरी खर्च.","कामगार, घंटे और प्रति घंटा दर पर आधारित मजदूरी लागत."],
+ machineryV2:["यंत्राचे तास आणि प्रति तास दरावर आधारित खर्च.","मशीन घंटे और प्रति घंटा दर पर आधारित लागत."],
+ lossV2:["एकूण कापणी आणि विक्रीयोग्य उत्पादन वेगळे मोजा.","कुल कटाई और बिक्री योग्य उपज को अलग-अलग मापें."],
+ yieldConvertV2:["किलो, क्विंटल आणि टन यांचे रूपांतर करा.","किलो, क्विंटल और टन में रूपांतरण करें."],
+ areaPlanV2:["क्षेत्रफळ आणि अंतरावरून रोपांची संख्या अंदाजे काढा.","क्षेत्रफल और दूरी से पौधों की संख्या का अनुमान लगाएं."]
+};
+function v2ToolTitle(id){const x=V2_TOOL_TR[id]; return lang==='en'?V2_TOOL_DEFS.find(a=>a.id===id).title:x[lang==='mr'?0:1];}
+function v2ToolDesc(id){const x=V2_TOOL_DESC_TR[id]; return lang==='en'?V2_TOOL_DEFS.find(a=>a.id===id).desc:x[lang==='mr'?0:1];}
+const V2_GUIDE_TR = {
+ "How to Build a 1-Acre Farm Budget":["१ एकर शेती बजेट कसे तयार करावे","1 एकड़ खेती बजट कैसे बनाएं"],
+ "How to Read a Farm Calculation":["शेती गणना कशी समजून घ्यावी","फार्म कैलकुलेशन को कैसे समझें"],
+ "NPK Is Not the Same as Fertilizer Quantity":["NPK म्हणजे खताचे प्रमाण नाही","NPK का मतलब उर्वरक की मात्रा नहीं है"],
+ "How to Plan Spray Water":["फवारणीसाठी पाण्याचे नियोजन कसे करावे","स्प्रे पानी की योजना कैसे बनाएं"],
+ "Irrigation: mm to Litres":["सिंचन: mm ते लिटर","सिंचाई: mm से लीटर"],
+ "Marketable Yield vs Total Harvest":["विक्रीयोग्य उत्पादन विरुद्ध एकूण कापणी","बिक्री योग्य उपज बनाम कुल कटाई"],
+ "Profit vs B:C Ratio":["नफा विरुद्ध B:C गुणोत्तर","लाभ बनाम B:C अनुपात"],
+ "Break-even Price and Break-even Yield":["ब्रेक-इव्हन किंमत आणि उत्पादन","ब्रेक-ईवन कीमत और उपज"],
+ "What a Farmer Should Record":["शेतकऱ्याने कोणत्या नोंदी ठेवाव्यात","किसान को कौन से रिकॉर्ड रखने चाहिए"],
+ "Turn Farm Records Into Next-Season Decisions":["शेती नोंदींचा पुढील हंगामाच्या निर्णयात वापर","फार्म रिकॉर्ड को अगले सीजन के फैसलों में बदलें"]
+};
+function v2GuideTitle(en){const x=V2_GUIDE_TR[en]; return lang==='en'?en:(x||[en,en])[lang==='mr'?0:1];}
+const V2_GUIDE_TEXT_TR = {
+ "Start with area, list every field cost, estimate marketable yield, enter a realistic selling price, then calculate revenue, profit, B:C and break-even. Keep actual expenses beside the estimate.":["क्षेत्रफळापासून सुरुवात करा, प्रत्येक शेतखर्च लिहा, विक्रीयोग्य उत्पादनाचा अंदाज घ्या, वास्तववादी विक्री किंमत भरा आणि महसूल, नफा, B:C व ब्रेक-इव्हन काढा. अंदाजासोबत प्रत्यक्ष खर्चही लिहा.","क्षेत्रफल से शुरू करें, हर खेत लागत लिखें, बिक्री योग्य उपज का अनुमान लगाएं, वास्तविक बिक्री कीमत डालें और राजस्व, लाभ, B:C तथा ब्रेक-ईवन निकालें। अनुमान के साथ वास्तविक खर्च भी रखें."],
+ "Every calculator result has assumptions. Check the unit, area, input rate, product concentration, yield basis and price basis before using the number for a real decision.":["प्रत्येक कॅल्क्युलेटरच्या निकालामागे गृहितके असतात. प्रत्यक्ष निर्णय घेण्यापूर्वी एकक, क्षेत्रफळ, इनपुट दर, उत्पादनाची एकाग्रता, उत्पादनाचा आधार आणि किंमतीचा आधार तपासा.","हर कैलकुलेटर परिणाम में मान्यताएं होती हैं। वास्तविक निर्णय से पहले इकाई, क्षेत्रफल, इनपुट दर, उत्पाद सांद्रता, उपज आधार और कीमत आधार जांचें."],
+ "N, P₂O₅ and K₂O are nutrient quantities. Fertilizer products contain those nutrients at specific percentages. Convert nutrient need to product quantity only after checking the actual product analysis.":["N, P₂O₅ आणि K₂O ही पोषकद्रव्यांची मात्रा आहेत. खतांमध्ये ही पोषकद्रव्ये ठराविक टक्केवारीत असतात. प्रत्यक्ष खत विश्लेषण तपासल्यानंतरच पोषकद्रव्यांची गरज खताच्या प्रमाणात रूपांतरित करा.","N, P₂O₅ और K₂O पोषक तत्वों की मात्रा हैं। उर्वरक उत्पादों में ये निश्चित प्रतिशत में होते हैं। वास्तविक उत्पाद विश्लेषण जांचने के बाद ही पोषक जरूरत को उर्वरक मात्रा में बदलें."],
+ "Separate product dose from spray-water volume. Use the registered product label and sprayer capacity; then estimate how many full tanks are required for the field.":["उत्पादनाचा डोस आणि फवारणीच्या पाण्याचे प्रमाण वेगळे ठेवा. नोंदणीकृत उत्पादनाचे लेबल व स्प्रेयरची क्षमता तपासा आणि शेतासाठी किती पूर्ण टाक्या लागतील ते ठरवा.","उत्पाद डोज और स्प्रे पानी की मात्रा अलग रखें। पंजीकृत उत्पाद का लेबल और स्प्रेयर क्षमता जांचें, फिर खेत के लिए आवश्यक टैंक संख्या निकालें."],
+ "1 mm over 1 square metre equals 1 litre. Convert field area to square metres before estimating volume. Actual water delivered to the crop also depends on irrigation efficiency and field conditions.":["१ चौ.मी. क्षेत्रावर १ mm पाणी = १ लिटर. पाण्याचे प्रमाण मोजण्यापूर्वी क्षेत्रफळ चौ.मी.मध्ये रूपांतरित करा. प्रत्यक्ष पाणी पोहोचणे सिंचन कार्यक्षमता आणि शेताच्या स्थितीवरही अवलंबून असते.","1 वर्ग मीटर पर 1 mm पानी = 1 लीटर। मात्रा का अनुमान लगाने से पहले क्षेत्रफल को वर्ग मीटर में बदलें। फसल तक पहुंचने वाला वास्तविक पानी सिंचाई दक्षता और खेत की स्थिति पर भी निर्भर करता है."],
+ "Economic calculations should use marketable quantity, not only total harvested quantity. Separate damaged, rejected, storage and handling losses so revenue is not overstated.":["आर्थिक गणनांमध्ये फक्त एकूण कापणीऐवजी विक्रीयोग्य प्रमाण वापरा. खराब, नाकारलेले, साठवण आणि हाताळणीतील नुकसान वेगळे नोंदवा, म्हणजे महसूल जास्त दाखवला जाणार नाही.","आर्थिक गणना में केवल कुल कटाई नहीं बल्कि बिक्री योग्य मात्रा का उपयोग करें। खराब, अस्वीकृत, भंडारण और हैंडलिंग नुकसान अलग रखें ताकि राजस्व अधिक न दिखे."],
+ "Profit is an amount of money. B:C is a ratio of benefit to cost. Both should be calculated from the same cost and revenue assumptions.":["नफा ही पैशातील रक्कम आहे. B:C हे लाभ आणि खर्चाचे गुणोत्तर आहे. दोन्ही एकाच खर्च आणि महसूल गृहितकांवर आधारित असावेत.","लाभ एक धनराशि है। B:C लाभ और लागत का अनुपात है। दोनों की गणना समान लागत और राजस्व मान्यताओं से होनी चाहिए."],
+ "Break-even price is total cost divided by marketable yield. Break-even yield is total cost divided by expected selling price. They help you understand the minimum requirement to cover cost.":["ब्रेक-इव्हन किंमत = एकूण खर्च ÷ विक्रीयोग्य उत्पादन. ब्रेक-इव्हन उत्पादन = एकूण खर्च ÷ अपेक्षित विक्री किंमत. खर्च भरून काढण्यासाठी किमान गरज समजण्यास याचा उपयोग होतो.","ब्रेक-ईवन कीमत = कुल लागत ÷ बिक्री योग्य उपज। ब्रेक-ईवन उपज = कुल लागत ÷ अपेक्षित बिक्री कीमत। इससे लागत पूरी करने की न्यूनतम जरूरत समझ आती है."],
+ "Area, crop, variety, dates, seed, fertilizer, irrigation, crop-protection operations, labour, machinery, harvest quantity, marketable quantity and sale price create a useful season history.":["क्षेत्रफळ, पीक, वाण, तारखा, बियाणे, खत, सिंचन, पीक संरक्षण, मजुरी, यंत्रसामग्री, कापणी, विक्रीयोग्य उत्पादन आणि विक्री किंमत यांची नोंद पुढील हंगामासाठी उपयोगी इतिहास तयार करते.","क्षेत्रफल, फसल, किस्म, तारीख, बीज, उर्वरक, सिंचाई, फसल सुरक्षा, मजदूरी, मशीनरी, कटाई, बिक्री योग्य मात्रा और बिक्री कीमत का रिकॉर्ड उपयोगी सीजन इतिहास बनाता है."],
+ "Compare estimated vs actual cost, yield and price. Identify the largest cost items and biggest sources of loss, then use those observations when planning the next crop.":["अंदाजित आणि प्रत्यक्ष खर्च, उत्पादन व किंमत यांची तुलना करा. सर्वात मोठे खर्च आणि नुकसानाचे प्रमुख स्रोत ओळखा आणि पुढील पीक नियोजनात त्यांचा वापर करा.","अनुमानित और वास्तविक लागत, उपज और कीमत की तुलना करें। सबसे बड़ी लागत और नुकसान के मुख्य स्रोत पहचानें और अगले फसल नियोजन में उनका उपयोग करें."]
+};
+function v2GuideText(en){const x=V2_GUIDE_TEXT_TR[en]; return lang==='en'?en:(x||[en,en])[lang==='mr'?0:1];}
+
+function renderCropIntel(filter){
+  const L=v2Lang(); const names=filter==="all"?Object.keys(V2_CROPS):[filter]; const n=names[0], c=V2_CROPS[n];
+  let stages=c.stages.map((s,i)=>`<div class="v2-stage"><b>${i+1}. ${v2tx(s[0])}</b><span>${v2tx(s[1])}</span></div>`).join("");
+  document.getElementById("cropIntelContent").innerHTML=`<h3 style="margin-top:0">${c.icon} ${v2TextForCrop(n)}</h3><p>${v2tx(c.intro)}</p><h4>${L.stages}</h4>${stages}<p class="v2-note"><b>${L.field} record:</b> ${v2tx("Record field observations instead of relying on memory.")} ${v2tx("Use these records with Farmlytic calculators.")}</p>`;
+  document.querySelectorAll("[data-cropfilter]").forEach(b=>b.classList.toggle("active",b.dataset.cropfilter===filter));
+}
+function renderKnowledge(filter){
+  const L=v2Lang(); let list=V2_GUIDES; const enCatMap={Planning:L.planningCat,Inputs:L.inputs,Water:L.water,Yield:L.yield,Economics:L.economicsCat,Records:L.records};
+  if(filter!==L.all) list=list.filter(x=>(enCatMap[x.cat]||x.cat)===filter);
+  document.getElementById("knowledgeContent").innerHTML=list.map((g,i)=>`<article class="card v2-card" data-knowledge="${i}"><div class="icon">${g.icon}</div><span class="pill">${enCatMap[g.cat]||g.cat}</span><h3>${v2GuideTitle(g.title)}</h3><p>${v2GuideText(g.text)}</p><div class="v2-actions"><button type="button">${L.read}</button></div></article>`).join("");
+  document.querySelectorAll("[data-knowledge]").forEach(card=>card.addEventListener("click",()=>{const g=list[Number(card.dataset.knowledge)];openV2Info(v2GuideTitle(g.title),g.icon,v2GuideText(g.text));}));
+  document.querySelectorAll("[data-kfilter]").forEach(b=>b.classList.toggle("active",b.dataset.kfilter===filter));
+}
+function renderV2Tools(filter){
+  const L=v2Lang(); const catMap={Planning:L.planningCat,Inputs:L.inputs,Water:L.water,Yield:L.yield,Economics:L.economicsCat,Records:L.records,Costs:L.costs,Utilities:L.utilities}; let list=V2_TOOL_DEFS;
+  if(filter!==L.all) list=list.filter(x=>(catMap[x.cat]||x.cat)===filter);
+  document.getElementById("v2ToolGrid").innerHTML=list.map(x=>`<div class="card v2-card" data-v2id="${x.id}"><div class="icon">${x.icon}</div><span class="pill">${catMap[x.cat]||x.cat}</span><h3>${v2ToolTitle(x.id)}</h3><p>${v2ToolDesc(x.id)}</p></div>`).join("");
+  document.querySelectorAll("[data-v2id]").forEach(c=>c.addEventListener("click",()=>openV2Tool(c.dataset.v2id)));
+  document.querySelectorAll("[data-tfilter]").forEach(b=>b.classList.toggle("active",b.dataset.tfilter===filter));
+}
+function openV2Info(title,icon,text){const body=`<div class="result"><strong>${icon} ${title}</strong><p style="margin-top:10px">${text}</p><hr><p class="v2-note">${v2tx("Use the information as a planning aid. Crop-specific rates, product doses and schedules should be verified against current official/local agricultural recommendations.")}</p></div>`;show(title,"Farmlytic V2",body);}
+function v2Field(id,label){return `<div class="field"><label>${label}</label><input id="${id}" type="number" min="0" step="any" placeholder="0"></div>`}
+function v2Btn(label="Calculate"){return `<button class="calcbtn" id="v2CalcBtn" type="button">${label}</button>`}
+function openV2Tool(id){
+  const L=v2Lang(); let title=v2ToolTitle(id),desc=v2ToolDesc(id),body="";
+  const lab=lang==='mr'?{cost:"एकूण खर्च (₹)",yield:"विक्रीयोग्य उत्पादन (kg)",price:"अपेक्षित विक्री किंमत (₹/kg)",seed:"बियाणे (₹)",fert:"खत (₹)",pest:"पीक संरक्षण (₹)",labour:"मजुरी (₹)",mach:"यंत्रसामग्री (₹)",irrig:"सिंचन (₹)",other:"इतर (₹)",water:"एकूण फवारणी पाणी (L)",tank:"स्प्रेयर टाकी क्षमता (L)",workers:"कामगार",hours:"प्रति कामगार तास",rate:"प्रति तास दर (₹)",mh:"यंत्राचे तास",mr:"प्रति तास यंत्र दर (₹)",harv:"एकूण कापणी (kg)",market:"विक्रीयोग्य (kg)",value:"मूल्य",row:"ओळीतील अंतर (m)",plant:"रोपांतील अंतर (m)"}:lang==='hi'?{cost:"कुल लागत (₹)",yield:"बिक्री योग्य उपज (kg)",price:"अपेक्षित बिक्री कीमत (₹/kg)",seed:"बीज (₹)",fert:"उर्वरक (₹)",pest:"फसल सुरक्षा (₹)",labour:"मजदूरी (₹)",mach:"मशीनरी (₹)",irrig:"सिंचाई (₹)",other:"अन्य (₹)",water:"कुल स्प्रे पानी (L)",tank:"स्प्रेयर टैंक क्षमता (L)",workers:"कामगार",hours:"प्रति कामगार घंटे",rate:"प्रति घंटे दर (₹)",mh:"मशीन घंटे",mr:"प्रति घंटे मशीन दर (₹)",harv:"कुल कटाई (kg)",market:"बिक्री योग्य (kg)",value:"मान",row:"पंक्ति दूरी (m)",plant:"पौध दूरी (m)"}:{cost:"Total cost (₹)",yield:"Marketable yield (kg)",price:"Expected selling price (₹/kg)",seed:"Seed (₹)",fert:"Fertilizer (₹)",pest:"Crop protection (₹)",labour:"Labour (₹)",mach:"Machinery (₹)",irrig:"Irrigation (₹)",other:"Other (₹)",water:"Total spray water (L)",tank:"Sprayer tank capacity (L)",workers:"Workers",hours:"Hours per worker",rate:"Rate per worker-hour (₹)",mh:"Machine hours",mr:"Rate per machine-hour (₹)",harv:"Total harvested (kg)",market:"Marketable (kg)",value:"Value",row:"Row spacing (m)",plant:"Plant spacing (m)"};
+  if(id==="breakEven") body=v2Field("v2cost",lab.cost)+v2Field("v2yield",lab.yield)+v2Field("v2price",lab.price)+v2Btn(L.calc);
+  if(id==="farmBudget") body=v2Field("bseed",lab.seed)+v2Field("bfert",lab.fert)+v2Field("bpest",lab.pest)+v2Field("blab",lab.labour)+v2Field("bmach",lab.mach)+v2Field("birrig",lab.irrig)+v2Field("bother",lab.other)+v2Btn(L.calc);
+  if(id==="revenueV2") body=v2Field("ryield",lab.yield)+v2Field("rprice",lab.price)+v2Btn(L.calc);
+  if(id==="seedCostV2") body=v2Field("sq",lang==='mr'?"बियाणे प्रमाण (kg)":lang==='hi'?"बीज मात्रा (kg)":"Seed quantity (kg)")+v2Field("sp",lang==='mr'?"बियाणे किंमत (₹/kg)":lang==='hi'?"बीज कीमत (₹/kg)":"Seed price (₹/kg)")+v2Btn(L.calc);
+  if(id==="sprayTankV2") body=v2Field("sw",lab.water)+v2Field("st",lab.tank)+v2Btn(L.calc);
+  if(id==="labourV2") body=v2Field("lw",lab.workers)+v2Field("lh",lab.hours)+v2Field("lr",lab.rate)+v2Btn(L.calc);
+  if(id==="machineryV2") body=v2Field("mh",lab.mh)+v2Field("mr",lab.mr)+v2Btn(L.calc);
+  if(id==="lossV2") body=v2Field("lhv",lab.harv)+v2Field("lmv",lab.market)+v2Btn(L.calc);
+  if(id==="yieldConvertV2") body=v2Field("yv",lab.value)+unit("yvfrom",["kg","quintal","tonne"])+unit("yvto",["kg","quintal","tonne"])+v2Btn(lang==='mr'?"रूपांतर करा":lang==='hi'?"कन्वर्ट करें":"Convert");
+  if(id==="areaPlanV2") body=v2Field("aa",lang==='mr'?"क्षेत्रफळ (acre)":lang==='hi'?"क्षेत्रफल (acre)":"Area (acre)")+v2Field("arow",lab.row)+v2Field("aplant",lab.plant)+v2Btn(L.calc);
+  show(title,desc,body); document.getElementById("v2CalcBtn").addEventListener("click",()=>runV2Calc(id));
+}
+function runEco(){
+  const y=parseFloat(document.getElementById("ecoYield").value)||0,p=parseFloat(document.getElementById("ecoPrice").value)||0,c=parseFloat(document.getElementById("ecoCostInput").value)||0; const r=y*p,pr=r-c;
+  document.getElementById("ecoRevenue").textContent=money(r); document.getElementById("ecoCost").textContent=money(c); document.getElementById("ecoProfit").textContent=money(pr);
+  const msg=pr>=0?v2tx("Current assumptions produce a positive planning margin."):v2tx("Current assumptions are below total cost; review price, yield or cost assumptions."); document.getElementById("ecoMessage").textContent=msg;
+}
+function setEcoScenario(which){
+  const p=document.getElementById("ecoPrice");
+  p.value=which==="low"?Math.max(1,Number(p.value)*0.8):(Number(p.value)*1.2);
+  runEco();
+}
+
+
+try{renderV2();}catch(e){console.error("Farmlytic V2 init:",e)}
+</script>
+</body>
+</html>
